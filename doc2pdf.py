@@ -52,7 +52,7 @@ def convert(word, file: Path):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(__package__, description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         'file', nargs='+', type=str, help='Word file (.doc, .docx), glob supports'
     )
