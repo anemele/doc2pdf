@@ -1,16 +1,9 @@
-#!/usr/bin/env python3.8
-# -*- encoding: utf-8 -*-
-
-"""convert Word file (.doc, .docx) to PDF file (.pdf)"""
-
-import argparse
-import glob
-import os.path
-from itertools import chain
 from pathlib import Path
-from typing import List
+from typing import Iterable
 
 from win32com import client
+
+from .log import logger
 
 # available format code
 # wdFormatDocument = 0
@@ -40,43 +33,24 @@ from win32com import client
 # wdFormatXMLTemplateMacroEnabled = 15
 
 
-def convert(word, file: Path):
+def _convert(word, path: Path):
     try:
-        doc_abspath = file.absolute()
+        doc_abspath = path.absolute()
         doc = word.Documents.Open(str(doc_abspath))
         pdf_abspath = doc_abspath.with_suffix('.pdf')
         doc.SaveAs(str(pdf_abspath), 17)  # ref: above code list
-        print('done', file)
     except Exception as e:
-        print('error', e)
+        return e
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        'file', nargs='+', type=str, help='Word file (.doc, .docx), glob supports'
-    )
-
-    return parser.parse_args()
-
-
-def main():
-    args = parse_args()
-    # print(args)
-    # return
-    args_file: List[str] = args.file
-
-    files = map(
-        Path, filter(os.path.isfile, chain.from_iterable(map(glob.iglob, args_file)))
-    )
-
+def convert(paths: Iterable[Path]):
     word = client.DispatchEx('Word.Application')
     try:
-        for file in files:
-            convert(word, file)
+        for path in paths:
+            r = _convert(word, path)
+            if r is None:
+                logger.info(f'done: {path}')
+            else:
+                logger.error(r)
     finally:
         word.Quit()
-
-
-if __name__ == '__main__':
-    main()
