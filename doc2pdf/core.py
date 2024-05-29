@@ -1,9 +1,17 @@
+import logging
+import sys
 from pathlib import Path
 from typing import Iterable
 
 from win32com import client
 
-from .log import logger
+logging.basicConfig(
+    format='[%(levelname)s] %(message)s',
+    level=logging.INFO,
+    stream=sys.stdout,
+)
+logger = logging.getLogger(__package__)
+
 
 # available format code
 # wdFormatDocument = 0

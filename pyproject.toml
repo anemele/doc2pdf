@@ -9,6 +9,8 @@ readme = "README.md"
 python = "^3.11"
 pywin32 = "306"
 
+[tool.poetry.scripts]
+doc2pdf = "doc2pdf.cli:main"
 
 [build-system]
 requires = ["poetry-core"]
